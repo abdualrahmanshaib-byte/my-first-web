@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const editorContent = document.getElementById('editor-content');
 
+
     // Set focus to editor on load
     editorContent.focus();
 
@@ -22,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     node = node.parentNode;
                 }
+
 
                 if (isInsideEditor) {
                     savedSelection = sel.getRangeAt(0);
@@ -67,6 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
             el.innerHTML = html;
             const frag = document.createDocumentFragment();
             let node, lastNode;
+
 
             while ((node = el.firstChild)) {
                 lastNode = frag.appendChild(node);
@@ -235,6 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
         attachKeyboardEvent(enterBtn, () => insertHTMLAtCursor('<br>'));
         panel.appendChild(enterBtn);
 
+
         const backspaceBtn = document.createElement('button');
         backspaceBtn.className = 'key-btn wide';
         backspaceBtn.textContent = 'مسح (⌫)';
@@ -270,6 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
     exportBtn.addEventListener('click', () => {
         const element = document.getElementById('paper');
 
+
         // Options for html2pdf
         const opt = {
             margin:       0,
@@ -283,6 +288,7 @@ document.addEventListener('DOMContentLoaded', () => {
         element.style.transform = 'none';
         element.style.marginBottom = '0';
         element.classList.add('exporting');
+
 
         html2pdf().set(opt).from(element).save().then(() => {
             // Restore styles after generation
