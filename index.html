@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محرر اختبارات الرياضيات</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- مكتبة html2pdf لتصدير الملفات كـ PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- مكتبة لخطوط رائعة للرياضيات والتصميم العام -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- منطقة المحرر / عرض الورقة -->
+        <main class="editor-area">
+            <div id="paper" class="a4-paper">
+                <!-- إطار الورقة -->
+                <div class="paper-border">
+                    <!-- الترويسة -->
+                    <header class="paper-header">
+                        <div class="header-right">
+                            <p>الجمهورية اليمنية</p>
+                            <p>وزارة التربية والتعليم</p>
+                            <p>محافظة الحديدة</p>
+                            <p>مدرسة السلام الأهلية</p>
+                        </div>
+                        <div class="header-center">
+                            <h2>اختبار مادة الرياضيات</h2>
+                        </div>
+                        <div class="header-left">
+                            <p>المادة: ......................</p>
+                            <p>الصف: ........................</p>
+                            <p>اسم الطالب: ....................</p>
+                            <p>التاريخ: .......................</p>
+                        </div>
+                    </header>
+                    <hr class="header-divider">
+                    <!-- مساحة كتابة الاختبار -->
+                    <div id="editor-content" class="editor-content" contenteditable="true" spellcheck="false" inputmode="none" placeholder="ابدأ بكتابة الأسئلة هنا..."></div>
+                </div>
+            </div>
+        </main>
+
+        <!-- لوحة المفاتيح المخصصة -->
+        <section class="keyboard-area">
+            <!-- أدوات التحكم مثل التصدير -->
+            <div class="toolbar">
+                <button id="export-pdf" class="btn primary-btn">تصدير كـ PDF</button>
+            </div>
+
+            <div class="keyboard-tabs">
+                <button class="tab-btn active" data-target="numbers">أرقام</button>
+                <button class="tab-btn" data-target="letters">أحرف</button>
+                <button class="tab-btn" data-target="symbols">رموز</button>
+                <button class="tab-btn" data-target="math-structs">كسور وجذور</button>
+                <button class="tab-btn" data-target="shapes">هندسة</button>
+            </div>
+
+            <div class="keyboard-panels">
+                <div id="numbers" class="panel active">
+                    <!-- سيتم توليد الأزرار عبر JS -->
+                </div>
+                <div id="letters" class="panel"></div>
+                <div id="symbols" class="panel"></div>
+                <div id="math-structs" class="panel"></div>
+                <div id="shapes" class="panel"></div>
+            </div>
+        </section>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
