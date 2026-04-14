@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 let node = sel.anchorNode;
                 let isInsideEditor = false;
                 while (node) {
-                    if (node === editorContent) {
+                    if (node && node.classList && node.classList.contains('editor-content')) {
                         isInsideEditor = true;
                         break;
                     }
@@ -43,15 +43,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 sel.addRange(savedSelection);
             }
         } else {
-            // Default to end of editor if no selection
-            const range = document.createRange();
-            range.selectNodeContents(editorContent);
-            range.collapse(false); // false means to the end
-            const sel = window.getSelection();
-            sel.removeAllRanges();
-            sel.addRange(range);
+            // Default to end of active editor if no selection
+            if (typeof currentActiveEditor !== 'undefined' && currentActiveEditor) {
+                const range = document.createRange();
+                range.selectNodeContents(currentActiveEditor);
+                range.collapse(false); // false means to the end
+                const sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(range);
+                currentActiveEditor.focus();
+            }
         }
-        editorContent.focus();
     };
 
     // Function to insert HTML at cursor
@@ -222,6 +224,134 @@ document.addEventListener('DOMContentLoaded', () => {
 
     renderKeyboard();
 
+
+    // --- Pagination Logic & Multi-page Save/Load ---
+    const addPageBtn = document.createElement('button');
+    addPageBtn.className = 'btn';
+    addPageBtn.style.backgroundColor = '#28a745';
+    addPageBtn.style.color = 'white';
+    addPageBtn.style.marginRight = '10px';
+    addPageBtn.textContent = 'إضافة صفحة';
+
+    addPageBtn.addEventListener('click', () => {
+        const editorArea = document.querySelector('.editor-area');
+        const firstPage = document.querySelector('.a4-paper');
+        const newPage = firstPage.cloneNode(true);
+
+        // Clear content of new page
+        const newContent = newPage.querySelector('.editor-content');
+        newContent.innerHTML = '';
+        newContent.id = 'editor-content-' + Date.now();
+
+        // Add page break class for PDF
+        newPage.style.pageBreakBefore = 'always';
+
+        editorArea.appendChild(newPage);
+
+        // Update listeners
+        bindEventsToContent(newContent);
+        const newHeaders = newPage.querySelectorAll('.paper-header [contenteditable="true"]');
+        newHeaders.forEach(el => el.addEventListener('input', saveAllPages));
+
+        saveAllPages();
+        newContent.focus();
+    });
+
+    // Dynamic focus handling for multi-page
+    let currentActiveEditor = document.getElementById('editor-content');
+
+    const bindEventsToContent = (contentEl) => {
+        contentEl.addEventListener('keyup', saveSelection);
+        contentEl.addEventListener('mouseup', saveSelection);
+        contentEl.addEventListener('focus', () => {
+            currentActiveEditor = contentEl;
+            saveSelection();
+        });
+        contentEl.addEventListener('input', () => {
+            checkAutoPagination(contentEl);
+            saveAllPages();
+        });
+    };
+
+    const checkAutoPagination = (contentEl) => {
+        if (contentEl.scrollHeight > 1000) {
+            contentEl.style.borderBottom = "2px dashed red";
+        } else {
+            contentEl.style.borderBottom = "none";
+        }
+    };
+
+    bindEventsToContent(document.getElementById('editor-content'));
+
+    const saveAllPages = () => {
+        const pages = document.querySelectorAll('.a4-paper');
+        const data = [];
+        pages.forEach(page => {
+            const content = page.querySelector('.editor-content').innerHTML;
+            const headers = Array.from(page.querySelectorAll('.paper-header [contenteditable="true"]')).map(el => el.innerHTML);
+            data.push({ content, headers });
+        });
+        localStorage.setItem('mathExamPages', JSON.stringify(data));
+    };
+
+    const loadAllPages = () => {
+        const savedData = localStorage.getItem('mathExamPages');
+        if (savedData) {
+            const data = JSON.parse(savedData);
+            const editorArea = document.querySelector('.editor-area');
+
+            const existingPages = document.querySelectorAll('.a4-paper');
+            const template = existingPages[0].cloneNode(true);
+            editorArea.innerHTML = ''; // Clear all
+
+            data.forEach((pageData, index) => {
+                const newPage = template.cloneNode(true);
+                const contentEl = newPage.querySelector('.editor-content');
+                contentEl.innerHTML = pageData.content;
+                contentEl.id = index === 0 ? 'editor-content' : 'editor-content-' + Date.now();
+
+                const headerEls = newPage.querySelectorAll('.paper-header [contenteditable="true"]');
+                if (pageData.headers && pageData.headers.length === headerEls.length) {
+                    headerEls.forEach((el, i) => {
+                        el.innerHTML = pageData.headers[i];
+                    });
+                }
+
+                if (index > 0) newPage.style.pageBreakBefore = 'always';
+
+                bindEventsToContent(contentEl);
+                headerEls.forEach(el => el.addEventListener('input', saveAllPages));
+
+                editorArea.appendChild(newPage);
+            });
+            currentActiveEditor = document.querySelector('.editor-content');
+        }
+    };
+
+    // Load initial pages
+    loadAllPages();
+
+    // Attach event listeners to headers on first load (if not loaded from storage)
+    document.querySelectorAll('.paper-header [contenteditable="true"]').forEach(el => el.addEventListener('input', saveAllPages));
+
+    const resetBtn = document.createElement('button');
+    resetBtn.className = 'btn';
+    resetBtn.style.backgroundColor = '#dc3545';
+    resetBtn.style.color = 'white';
+    resetBtn.style.marginRight = '10px';
+    resetBtn.textContent = 'اختبار جديد (مسح)';
+    resetBtn.addEventListener('click', () => {
+        if(confirm('هل أنت متأكد من مسح الاختبار الحالي وبدء واحد جديد؟')) {
+            localStorage.removeItem('mathExamPages');
+            location.reload();
+        }
+    });
+
+    const toolbar = document.querySelector('.toolbar');
+    toolbar.appendChild(resetBtn);
+    toolbar.appendChild(addPageBtn);
+
+
     // Tab Switching Logic
     const tabBtns = document.querySelectorAll('.tab-btn');
     const panels = document.querySelectorAll('.panel');
@@ -243,25 +373,38 @@ document.addEventListener('DOMContentLoaded', () => {
     exportBtn.addEventListener('click', () => {
         const element = document.getElementById('paper');
 
+
+        const pagesContainer = document.querySelector('.editor-area');
+
         // Options for html2pdf
         const opt = {
             margin:       0,
             filename:     'اختبار_الرياضيات.pdf',
             image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2, useCORS: true },
-            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            html2canvas:  { scale: 2, useCORS: true, windowWidth: 800 },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+            pagebreak:    { mode: ['css', 'legacy'] }
         };
 
-        // Add a temporary class to fix scaling issues during PDF generation on mobile
-        element.style.transform = 'none';
-        element.style.marginBottom = '0';
-        element.classList.add('exporting');
+        const pages = document.querySelectorAll('.a4-paper');
 
-        html2pdf().set(opt).from(element).save().then(() => {
-            // Restore styles after generation
-            element.style.transform = '';
-            element.style.marginBottom = '';
-            element.classList.remove('exporting');
+        // Force desktop width for PDF export to prevent issues on mobile
+        const originalWidth = pagesContainer.style.width;
+        pagesContainer.style.width = '210mm';
+
+        pages.forEach(p => {
+            p.style.transform = 'none';
+            p.style.marginBottom = '0';
+            p.classList.add('exporting');
+        });
+
+        html2pdf().set(opt).from(pagesContainer).save().then(() => {
+            pagesContainer.style.width = originalWidth;
+            pages.forEach(p => {
+                p.style.transform = '';
+                p.style.marginBottom = '';
+                p.classList.remove('exporting');
+            });
         });
     });
 

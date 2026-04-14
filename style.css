@@ -28,7 +28,8 @@ body {
     overflow-y: auto;
     padding: 20px;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
     background-color: #e0e0e0;
 }
 
@@ -270,15 +271,39 @@ body {
 /* Mobile Responsiveness for Editor Scale */
 @media screen and (max-width: 768px) {
     .a4-paper {
-        transform: scale(0.9);
-        transform-origin: top center;
-        margin-bottom: -10%; /* Compensate for scale */
+        width: 100%;
+        min-width: 100%;
+        height: auto;
+        min-height: auto;
+        padding: 5mm;
+        margin-bottom: 20px;
+    }
+    .paper-border {
+        min-height: auto;
+    }
+    .keyboard-area {
+        height: 50vh; /* Give more space for keyboard on mobile */
+    }
+    .header-center h2 {
+        font-size: 16px;
+    }
+    .paper-header {
+        font-size: 12px;
+        flex-wrap: wrap;
     }
 }
 @media screen and (max-width: 480px) {
     .a4-paper {
-        transform: scale(0.65);
-        transform-origin: top center;
-        margin-bottom: -35%;
+        padding: 2mm;
+    }
+    .paper-border {
+        padding: 5px;
+    }
+    .header-center h2 {
+        font-size: 14px;
+        padding: 2px 5px;
+    }
+    .paper-header {
+        font-size: 10px;
     }
 }
