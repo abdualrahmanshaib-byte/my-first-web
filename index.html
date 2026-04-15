@@ -5,69 +5,193 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>محرر اختبارات الرياضيات</title>
     <link rel="stylesheet" href="style.css">
-    <!-- مكتبة html2pdf لتصدير الملفات كـ PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <!-- مكتبة لخطوط رائعة للرياضيات والتصميم العام -->
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="app-container">
-        <!-- منطقة المحرر / عرض الورقة -->
-        <main class="editor-area">
-            <div id="paper" class="a4-paper">
-                <!-- إطار الورقة -->
-                <div class="paper-border">
-                    <!-- الترويسة -->
-                    <header class="paper-header">
-                        <div class="header-right">
-                            <p>الجمهورية اليمنية</p>
-                            <p>وزارة التربية والتعليم</p>
-                            <p>محافظة الحديدة</p>
-                            <p>مدرسة السلام الأهلية</p>
-                        </div>
-                        <div class="header-center">
-                            <h2>اختبار مادة الرياضيات</h2>
-                        </div>
-                        <div class="header-left">
-                            <p>المادة: ......................</p>
-                            <p>الصف: ........................</p>
-                            <p>اسم الطالب: ....................</p>
-                            <p>التاريخ: .......................</p>
-                        </div>
-                    </header>
-                    <hr class="header-divider">
-                    <!-- مساحة كتابة الاختبار -->
-                    <div id="editor-content" class="editor-content" contenteditable="true" spellcheck="false" inputmode="none" placeholder="ابدأ بكتابة الأسئلة هنا..."></div>
-                </div>
-            </div>
-        </main>
+<div class="toolbar" id="toolbar">
 
-        <!-- لوحة المفاتيح المخصصة -->
-        <section class="keyboard-area">
-            <!-- أدوات التحكم مثل التصدير -->
-            <div class="toolbar">
-                <button id="export-pdf" class="btn primary-btn">تصدير كـ PDF</button>
-            </div>
+  <div class="tabs-container">
+    <button class="tab-btn active" onclick="switchTab(event, 'letters-tab')">الحروف</button>
+    <button class="tab-btn" onclick="switchTab(event, 'sets-tab')">المجموعات</button>
+    <button class="tab-btn" onclick="switchTab(event, 'numbers-tab')">الأرقام</button>
+    <button class="tab-btn" onclick="switchTab(event, 'operations-tab')">العمليات والمجموعات</button>
+    <button class="tab-btn" onclick="switchTab(event, 'math-tab')">الجبر</button>
+    <button class="tab-btn" onclick="switchTab(event, 'geo-tab')">الهندسة</button>
+    <button class="tab-btn" onclick="switchTab(event, 'insert-tab')">إدراج وأشكال</button>
 
-            <div class="keyboard-tabs">
-                <button class="tab-btn active" data-target="numbers">أرقام</button>
-                <button class="tab-btn" data-target="letters">أحرف</button>
-                <button class="tab-btn" data-target="symbols">رموز</button>
-                <button class="tab-btn" data-target="math-structs">كسور وجذور</button>
-                <button class="tab-btn" data-target="shapes">هندسة</button>
-            </div>
+    <div class="tools-group">
+      <button class="action-btn" onmousedown="event.preventDefault()" onclick="undoAction()" title="تراجع (Ctrl+Z)">↩️</button>
+      <button class="action-btn" onmousedown="event.preventDefault()" onclick="redoAction()" title="إعادة (Ctrl+Y)">↪️</button>
 
-            <div class="keyboard-panels">
-                <div id="numbers" class="panel active">
-                    <!-- سيتم توليد الأزرار عبر JS -->
-                </div>
-                <div id="letters" class="panel"></div>
-                <div id="symbols" class="panel"></div>
-                <div id="math-structs" class="panel"></div>
-                <div id="shapes" class="panel"></div>
-            </div>
-        </section>
+      <div style="width: 10px;"></div>
+
+      <button class="color-btn" style="background: #000000;" onmousedown="event.preventDefault()" onclick="changeColor('#000000')"></button>
+      <button class="color-btn" style="background: #c0392b;" onmousedown="event.preventDefault()" onclick="changeColor('#c0392b')"></button>
+      <button class="color-btn" style="background: #2980b9;" onmousedown="event.preventDefault()" onclick="changeColor('#2980b9')"></button>
+      <button class="color-btn" style="background: #27ae60;" onmousedown="event.preventDefault()" onclick="changeColor('#27ae60')"></button>
+      <button class="pdf-btn" onclick="generatePDF()">📥 حفظ كـ PDF</button>
     </div>
-    <script src="script.js"></script>
+  </div>
+
+  <div id="letters-tab" class="keyboard-panel active-panel">
+    <button class="diwani-btn" onclick="insertDiwaniLetter('س')">س</button>
+    <button class="diwani-btn" onclick="insertDiwaniLetter('ص')">ص</button>
+    <button class="diwani-btn" onclick="insertDiwaniLetter('ع')">ع</button>
+    <button class="diwani-btn" onclick="insertDiwaniLetter('ل')">ل</button>
+    <button class="diwani-btn" onclick="insertDiwaniLetter('م')">م</button>
+    <button class="diwani-btn" onclick="insertDiwaniLetter('أ')">أ</button>
+    <button class="diwani-btn" onclick="insertDiwaniLetter('ب')">ب</button>
+    <button class="diwani-btn" onclick="insertDiwaniLetter('ج')">ج</button>
+    <button class="diwani-btn" onclick="insertDiwaniLetter('د')">د</button>
+  </div>
+
+  <div id="sets-tab" class="keyboard-panel">
+    <button onclick="insertSetLetter('حـــ')">حـــ</button>
+    <button onclick="insertSetLetter('طـــ')">طـــ</button>
+    <button onclick="insertSetLetter('صـــ')">صـــ</button>
+    <button onclick="insertSetLetter('نـــ')">نـــ</button>
+    <button onclick="insertSetLetter('كـــ')">كـــ</button>
+    <button onclick="insertSetLetter('فضاء')">فضاء</button>
+  </div>
+
+  <div id="numbers-tab" class="keyboard-panel">
+    <button onclick="insertText('٠')">٠</button>
+    <button onclick="insertText('١')">١</button>
+    <button onclick="insertText('٢')">٢</button>
+    <button onclick="insertText('٣')">٣</button>
+    <button onclick="insertText('٤')">٤</button>
+    <button onclick="insertText('٥')">٥</button>
+    <button onclick="insertText('٦')">٦</button>
+    <button onclick="insertText('٧')">٧</button>
+    <button onclick="insertText('٨')">٨</button>
+    <button onclick="insertText('٩')">٩</button>
+    <button onclick="insertText('٫')">٫</button>
+  </div>
+
+  <div id="operations-tab" class="keyboard-panel">
+    <button onclick="insertText('+')">+</button>
+    <button onclick="insertText('-')">-</button>
+    <button onclick="insertText('×')">×</button>
+    <button onclick="insertText('÷')">÷</button>
+    <button onclick="insertText('=')">=</button>
+    <button onclick="insertText('≠')">≠</button>
+    <button onclick="insertText('>')">></button>
+    <button onclick="insertText('<')"><</button>
+    <button onclick="insertText('≥')">≥</button>
+    <button onclick="insertText('≤')">≤</button>
+
+    <div style="width:100%; height:0px;"></div> <button onclick="insertText('∈')">∈ (ينتمي)</button>
+    <button onclick="insertText('∉')">∉ (لا ينتمي)</button>
+    <button onclick="insertText('⊂')">⊂ (جزئي)</button>
+    <button onclick="insertText('⊄')">⊄ (غير جزئي)</button>
+    <button onclick="insertText('∩')">∩ (تقاطع)</button>
+    <button onclick="insertText('∪')">∪ (اتحاد)</button>
+    <button onclick="insertText('∅')">∅ (فاي)</button>
+  </div>
+
+  <div id="math-tab" class="keyboard-panel">
+    <button class="special-btn" onmousedown="event.preventDefault()" onclick="toggleSuperscript()" title="كتابة أس (قوة)">x² (أس)</button>
+    <button class="special-btn" onmousedown="event.preventDefault()" onclick="toggleSubscript()" title="رقم سفلي">x₂ (سفلي)</button>
+    <button class="special-btn" style="background:#ffcccc!important; color:#900!important;" onclick="insertGradeBox()">📝 الدرجة</button>
+    <button class="special-btn" onmousedown="event.preventDefault()" onclick="insertFraction()">بسط/مقام</button>
+    <button class="special-btn" onmousedown="event.preventDefault()" onclick="insertRoot()">√ ممتد</button>
+    <button onclick="insertText('د(س)')">د(س)</button>
+    <button onclick="insertIntegration()">∫ مقلوبة</button>
+    <button onclick="insertText('∞')">∞</button>
+    <button onclick="insertText('مجـ')">مجـ</button>
+    <button onclick="insertText('نها')">نها</button>
+
+    <!-- الأزرار الجديدة للخروج من التنسيق -->
+    <div style="width:100%; height:0px;"></div>
+    <button class="special-btn exit-btn" onmousedown="event.preventDefault()" onclick="exitFormat()" title="خروج من الجذر/الكسر/الأس إلى النص العادي" style="background: #e1b12c!important; color: #fff!important;">➡️ خروج للمؤشر العادي</button>
+  </div>
+
+  <div id="geo-tab" class="keyboard-panel">
+    <button onclick="insertText('جا')">جا</button>
+    <button onclick="insertText('جتا')">جتا</button>
+    <button onclick="insertText('ظا')">ظا</button>
+    <button onclick="insertText('π')">π</button>
+    <button onclick="insertText('∠')">∠</button>
+    <button onclick="insertText('⊥')">⊥</button>
+    <button onclick="insertText('∥')">∥</button>
+  </div>
+
+  <div id="insert-tab" class="keyboard-panel" style="flex-direction: column; align-items: center;">
+
+    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+      <button class="special-btn" onclick="insertTable()">📊 إدراج جدول</button>
+      <button class="special-btn" style="background:#d1c4e9!important; color:#4a148c!important;" onclick="insertTextBox()">📝 إدراج مربع نص (سحب حر)</button>
+    </div>
+
+    <div id="shape-controls" class="shape-controls">
+      <div style="font-size: 12px; color: #f39c12; margin-bottom: 5px;">(اسحب الشكل لتحريكه، أو استخدم الأشرطة لتعديله)</div>
+      <label>الحجم: <input type="range" id="shape-size" min="15" max="300" value="40"></label>
+      <label>الدوران: <input type="range" id="shape-rotate" min="0" max="360" value="0"></label>
+    </div>
+
+    <div>
+      <button onclick="insertFloatingShape('○')">○</button>
+      <button onclick="insertFloatingShape('□')">□</button>
+      <button onclick="insertFloatingShape('△')">△</button>
+      <button onclick="insertFloatingShape('▭')">▭</button>
+      <button onclick="insertFloatingShape('⟷')">⟷</button>
+      <button onclick="insertFloatingShape('⟶')">⟶</button>
+      <button onclick="insertFloatingShape('⌒')">⌒</button>
+    </div>
+  </div>
+</div>
+
+<div id="printable-area" class="paper-container">
+  <div class="a4-page">
+    <div class="page-border">
+      <div class="header">
+
+        <div class="header-right">
+          <p contenteditable="true">الجمهورية اليمنية</p>
+          <p contenteditable="true">وزارة التربية والتعليم</p>
+          <p contenteditable="true">محافظة الحديدة</p>
+          <p contenteditable="true">مدرسة السلام الأهلية</p>
+        </div>
+
+        <div class="header-center">
+          <h1 class="basmala" contenteditable="true">بسم الله الرحمن الرحيم</h1>
+
+          <div class="logo-upload-container" contenteditable="false">
+            <input type="file" id="logo-input" accept="image/*" style="display: none;" onchange="loadLogo(event)">
+            <div id="logo-placeholder" onclick="document.getElementById('logo-input').click()">
+              📷 اضغط هنا لإضافة الشعار
+            </div>
+            <img id="logo-preview" src="" style="display: none;" onclick="document.getElementById('logo-input').click()" title="اضغط لتغيير الشعار">
+          </div>
+
+          <h2 class="test-title">
+            اختبار مادة الرياضيات لشهر: <span contenteditable="true" class="editable-field">..........</span> لعام: <span contenteditable="true" class="editable-field">..........</span>
+          </h2>
+        </div>
+
+        <div class="header-left">
+          <p>المادة: <span contenteditable="true" class="editable-field">رياضيات</span></p>
+          <p>الصف: <span contenteditable="true" class="editable-field">التاسع</span></p>
+          <p>الزمن: <span contenteditable="true" class="editable-field">ساعتان</span></p>
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <div class="content-area" contenteditable="true">
+        <div>السؤال الأول:</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="a4-page">
+    <div class="page-border">
+      <div class="content-area" contenteditable="true">
+        <div>تابع الأسئلة:</div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="script.js"></script>
 </body>
 </html>
