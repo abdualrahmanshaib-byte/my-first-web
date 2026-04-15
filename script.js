@@ -1,8 +1,28 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const editorContent = document.getElementById('editor-content');
+    const documentContainer = document.getElementById('document-container');
+    let activeEditor = document.querySelector('.editor-content');
+
+    // Load saved content from localStorage
+    const loadContent = () => {
+        const savedHTML = localStorage.getItem('mathTestContent');
+        if (savedHTML) {
+            documentContainer.innerHTML = savedHTML;
+            attachEventListenersToAllPages();
+            activeEditor = document.querySelector('.editor-content');
+        } else {
+            attachEventListenersToPage(documentContainer.querySelector('.page'));
+        }
+    };
+
+    // Save content to localStorage
+    const saveContentToStorage = () => {
+        // Clone container to remove active states/selections before saving
+        const clone = documentContainer.cloneNode(true);
+        localStorage.setItem('mathTestContent', clone.innerHTML);
+    };
 
     // Set focus to editor on load
-    editorContent.focus();
+    if (activeEditor) activeEditor.focus();
 
     // Preserve selection to insert text at cursor position
     let savedSelection = null;
@@ -12,12 +32,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (window.getSelection) {
             const sel = window.getSelection();
             if (sel.getRangeAt && sel.rangeCount) {
-                // Ensure selection is inside editor
+                // Ensure selection is inside one of the editors
                 let node = sel.anchorNode;
                 let isInsideEditor = false;
+                let currentActive = null;
                 while (node) {
-                    if (node === editorContent) {
+                    if (node.classList && node.classList.contains('editor-content')) {
                         isInsideEditor = true;
+                        currentActive = node;
                         break;
                     }
                     node = node.parentNode;
@@ -25,33 +47,98 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (isInsideEditor) {
                     savedSelection = sel.getRangeAt(0);
+                    activeEditor = currentActive;
+                    saveContentToStorage();
                 }
             }
         }
     };
 
-    editorContent.addEventListener('keyup', saveSelection);
-    editorContent.addEventListener('mouseup', saveSelection);
-    editorContent.addEventListener('focus', saveSelection);
+    const attachEventListenersToPage = (pageElement) => {
+        const editor = pageElement.querySelector('.editor-content');
+        if (editor) {
+            editor.addEventListener('keyup', saveSelection);
+            editor.addEventListener('mouseup', saveSelection);
+            editor.addEventListener('focus', saveSelection);
+            editor.addEventListener('input', saveContentToStorage);
+        }
+
+        // Content editable in headers
+        const editables = pageElement.querySelectorAll('[contenteditable="true"]');
+        editables.forEach(el => {
+            el.addEventListener('input', saveContentToStorage);
+        });
+
+        // Delete button
+        const deleteBtn = pageElement.querySelector('.delete-page-btn');
+        if (deleteBtn) {
+            deleteBtn.addEventListener('click', () => {
+                if (document.querySelectorAll('.page').length > 1) {
+                    pageElement.remove();
+                    saveContentToStorage();
+                } else {
+                    alert("لا يمكن حذف الصفحة الوحيدة.");
+                }
+            });
+        }
+    };
+
+    const attachEventListenersToAllPages = () => {
+        const pages = document.querySelectorAll('.page');
+        pages.forEach(attachEventListenersToPage);
+    };
+
+    loadContent();
+
+    // Add new page functionality
+    const addPageBtn = document.getElementById('add-page');
+    let pageCount = document.querySelectorAll('.page').length;
+
+    addPageBtn.addEventListener('click', () => {
+        pageCount++;
+        const newPage = document.createElement('div');
+        newPage.className = 'a4-paper page';
+        newPage.dataset.page = pageCount;
+
+        // Add only the border and editor content, not the header
+        newPage.innerHTML = `
+            <button class="delete-page-btn">حذف</button>
+            <div class="paper-border" style="min-height: calc(297mm - 20mm);">
+                <div class="editor-content" contenteditable="true" spellcheck="false" inputmode="none" placeholder="اكمل كتابة الأسئلة هنا..."></div>
+            </div>
+        `;
+
+        documentContainer.appendChild(newPage);
+        attachEventListenersToPage(newPage);
+
+        // Focus the new editor
+        const newEditor = newPage.querySelector('.editor-content');
+        newEditor.focus();
+        activeEditor = newEditor;
+
+        // Scroll to the new page
+        newPage.scrollIntoView({ behavior: 'smooth' });
+        saveContentToStorage();
+    });
 
     // Restore selection
     const restoreSelection = () => {
-        if (savedSelection) {
+        if (savedSelection && activeEditor) {
             if (window.getSelection) {
                 const sel = window.getSelection();
                 sel.removeAllRanges();
                 sel.addRange(savedSelection);
             }
-        } else {
-            // Default to end of editor if no selection
+        } else if (activeEditor) {
+            // Default to end of active editor if no selection
             const range = document.createRange();
-            range.selectNodeContents(editorContent);
+            range.selectNodeContents(activeEditor);
             range.collapse(false); // false means to the end
             const sel = window.getSelection();
             sel.removeAllRanges();
             sel.addRange(range);
         }
-        editorContent.focus();
+        if (activeEditor) activeEditor.focus();
     };
 
     // Function to insert HTML at cursor
@@ -241,7 +328,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // PDF Export Logic
     const exportBtn = document.getElementById('export-pdf');
     exportBtn.addEventListener('click', () => {
-        const element = document.getElementById('paper');
+        const element = document.getElementById('document-container');
+
+        // Hide delete buttons before export
+        const deleteBtns = element.querySelectorAll('.delete-page-btn');
+        deleteBtns.forEach(btn => btn.style.display = 'none');
 
         // Options for html2pdf
         const opt = {
@@ -253,15 +344,22 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         // Add a temporary class to fix scaling issues during PDF generation on mobile
-        element.style.transform = 'none';
-        element.style.marginBottom = '0';
+        const pages = element.querySelectorAll('.page');
+        pages.forEach(p => {
+            p.style.transform = 'none';
+            p.style.marginBottom = '0';
+        });
         element.classList.add('exporting');
 
         html2pdf().set(opt).from(element).save().then(() => {
             // Restore styles after generation
-            element.style.transform = '';
-            element.style.marginBottom = '';
+            pages.forEach(p => {
+                p.style.transform = '';
+                p.style.marginBottom = '';
+            });
             element.classList.remove('exporting');
+            // Show delete buttons again
+            deleteBtns.forEach(btn => btn.style.display = '');
         });
     });
 

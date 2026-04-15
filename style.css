@@ -28,8 +28,16 @@ body {
     overflow-y: auto;
     padding: 20px;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
     background-color: #e0e0e0;
+}
+
+#document-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
 }
 
 .a4-paper {
@@ -41,17 +49,44 @@ body {
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     padding: 10mm;
     margin-bottom: 20px;
+    page-break-after: always;
+}
+
+.a4-paper:last-child {
+    page-break-after: auto;
 }
 
 /* Print/PDF specific adjustments */
 @media print {
     .keyboard-area, .editor-area { padding: 0; background: white; }
-    .a4-paper { box-shadow: none; margin: 0; width: 100%; height: auto; }
+    .a4-paper { box-shadow: none; margin: 0; width: 100%; height: auto; page-break-after: always; }
+    .a4-paper:last-child { page-break-after: auto; }
     .empty-space-box::before { display: none; }
 }
 
 .exporting .empty-space-box::before {
     display: none;
+}
+
+.delete-page-btn {
+    position: absolute;
+    top: 5mm;
+    left: 5mm;
+    background-color: #ff4d4f;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.delete-page-btn:hover {
+    background-color: #ff7875;
+}
+
+.a4-paper {
+    position: relative;
 }
 
 .paper-border {
