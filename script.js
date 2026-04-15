@@ -1,8 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const editorContent = document.getElementById('editor-content');
+    const editors = document.querySelectorAll('.editor-content');
+    let activeEditor = editors[0];
 
-    // Set focus to editor on load
-    editorContent.focus();
+    // Set focus to the first editor on load
+    activeEditor.focus();
 
     // Preserve selection to insert text at cursor position
     let savedSelection = null;
@@ -12,12 +13,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (window.getSelection) {
             const sel = window.getSelection();
             if (sel.getRangeAt && sel.rangeCount) {
-                // Ensure selection is inside editor
+                // Ensure selection is inside one of the editors
                 let node = sel.anchorNode;
                 let isInsideEditor = false;
                 while (node) {
-                    if (node === editorContent) {
+                    if (node.classList && node.classList.contains('editor-content')) {
                         isInsideEditor = true;
+                        activeEditor = node;
                         break;
                     }
                     node = node.parentNode;
@@ -30,9 +32,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    editorContent.addEventListener('keyup', saveSelection);
-    editorContent.addEventListener('mouseup', saveSelection);
-    editorContent.addEventListener('focus', saveSelection);
+    editors.forEach(editor => {
+        editor.addEventListener('keyup', saveSelection);
+        editor.addEventListener('mouseup', saveSelection);
+        editor.addEventListener('focus', saveSelection);
+    });
 
     // Restore selection
     const restoreSelection = () => {
@@ -43,15 +47,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 sel.addRange(savedSelection);
             }
         } else {
-            // Default to end of editor if no selection
+            // Default to end of active editor if no selection
             const range = document.createRange();
-            range.selectNodeContents(editorContent);
+            range.selectNodeContents(activeEditor);
             range.collapse(false); // false means to the end
             const sel = window.getSelection();
             sel.removeAllRanges();
             sel.addRange(range);
         }
-        editorContent.focus();
+        activeEditor.focus();
     };
 
     // Function to insert HTML at cursor
@@ -241,15 +245,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // PDF Export Logic
     const exportBtn = document.getElementById('export-pdf');
     exportBtn.addEventListener('click', () => {
-        const element = document.getElementById('paper');
+        const element = document.getElementById('paper-container');
 
         // Options for html2pdf
         const opt = {
             margin:       0,
-            filename:     'اختبار_الرياضيات.pdf',
+            filename:     'مستند_الرياضيات.pdf',
             image:        { type: 'jpeg', quality: 0.98 },
             html2canvas:  { scale: 2, useCORS: true },
-            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+            pagebreak:    { mode: ['css', 'legacy'] }
         };
 
         // Add a temporary class to fix scaling issues during PDF generation on mobile

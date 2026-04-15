@@ -14,30 +14,25 @@
     <div class="app-container">
         <!-- منطقة المحرر / عرض الورقة -->
         <main class="editor-area">
-            <div id="paper" class="a4-paper">
-                <!-- إطار الورقة -->
-                <div class="paper-border">
-                    <!-- الترويسة -->
-                    <header class="paper-header">
-                        <div class="header-right">
-                            <p>الجمهورية اليمنية</p>
-                            <p>وزارة التربية والتعليم</p>
-                            <p>محافظة الحديدة</p>
-                            <p>مدرسة السلام الأهلية</p>
-                        </div>
-                        <div class="header-center">
-                            <h2>اختبار مادة الرياضيات</h2>
-                        </div>
-                        <div class="header-left">
-                            <p>المادة: ......................</p>
-                            <p>الصف: ........................</p>
-                            <p>اسم الطالب: ....................</p>
-                            <p>التاريخ: .......................</p>
-                        </div>
-                    </header>
-                    <hr class="header-divider">
-                    <!-- مساحة كتابة الاختبار -->
-                    <div id="editor-content" class="editor-content" contenteditable="true" spellcheck="false" inputmode="none" placeholder="ابدأ بكتابة الأسئلة هنا..."></div>
+            <div id="paper-container" class="paper-container">
+                <!-- الصفحة الأولى -->
+                <div class="a4-paper page" id="page-1">
+                    <!-- إطار الورقة -->
+                    <div class="paper-border">
+                        <!-- مساحة كتابة الاختبار -->
+                        <div class="editor-content" contenteditable="true" spellcheck="false" inputmode="none" placeholder="ابدأ بكتابة الأسئلة هنا (الصفحة الأولى)..."></div>
+                    </div>
+                </div>
+
+                <div class="html2pdf__page-break"></div>
+
+                <!-- الصفحة الثانية -->
+                <div class="a4-paper page" id="page-2">
+                    <!-- إطار الورقة -->
+                    <div class="paper-border">
+                        <!-- مساحة كتابة الاختبار -->
+                        <div class="editor-content" contenteditable="true" spellcheck="false" inputmode="none" placeholder="ابدأ بكتابة الأسئلة هنا (الصفحة الثانية)..."></div>
+                    </div>
                 </div>
             </div>
         </main>
