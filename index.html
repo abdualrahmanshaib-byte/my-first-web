@@ -14,30 +14,32 @@
     <div class="app-container">
         <!-- منطقة المحرر / عرض الورقة -->
         <main class="editor-area">
-            <div id="paper" class="a4-paper">
-                <!-- إطار الورقة -->
-                <div class="paper-border">
-                    <!-- الترويسة -->
-                    <header class="paper-header">
-                        <div class="header-right">
-                            <p>الجمهورية اليمنية</p>
-                            <p>وزارة التربية والتعليم</p>
-                            <p>محافظة الحديدة</p>
-                            <p>مدرسة السلام الأهلية</p>
-                        </div>
-                        <div class="header-center">
-                            <h2>اختبار مادة الرياضيات</h2>
-                        </div>
-                        <div class="header-left">
-                            <p>المادة: ......................</p>
-                            <p>الصف: ........................</p>
-                            <p>اسم الطالب: ....................</p>
-                            <p>التاريخ: .......................</p>
-                        </div>
-                    </header>
-                    <hr class="header-divider">
-                    <!-- مساحة كتابة الاختبار -->
-                    <div id="editor-content" class="editor-content" contenteditable="true" spellcheck="false" inputmode="none" placeholder="ابدأ بكتابة الأسئلة هنا..."></div>
+            <div id="document-container">
+                <div class="a4-paper page" data-page="1">
+                    <!-- إطار الورقة -->
+                    <div class="paper-border">
+                        <!-- الترويسة -->
+                        <header class="paper-header">
+                            <div class="header-right">
+                                <p contenteditable="true">الجمهورية اليمنية</p>
+                                <p contenteditable="true">وزارة التربية والتعليم</p>
+                                <p contenteditable="true">محافظة الحديدة</p>
+                                <p contenteditable="true">مدرسة السلام الأهلية</p>
+                            </div>
+                            <div class="header-center">
+                                <h2 contenteditable="true">اختبار مادة الرياضيات</h2>
+                            </div>
+                            <div class="header-left">
+                                <p contenteditable="true">المادة: ......................</p>
+                                <p contenteditable="true">الصف: ........................</p>
+                                <p contenteditable="true">اسم الطالب: ....................</p>
+                                <p contenteditable="true">التاريخ: .......................</p>
+                            </div>
+                        </header>
+                        <hr class="header-divider">
+                        <!-- مساحة كتابة الاختبار -->
+                        <div class="editor-content" contenteditable="true" spellcheck="false" inputmode="none" placeholder="ابدأ بكتابة الأسئلة هنا..."></div>
+                    </div>
                 </div>
             </div>
         </main>
@@ -46,7 +48,8 @@
         <section class="keyboard-area">
             <!-- أدوات التحكم مثل التصدير -->
             <div class="toolbar">
-                <button id="export-pdf" class="btn primary-btn">تصدير كـ PDF</button>
+                <button id="add-page" class="btn">إضافة صفحة</button>
+                <button id="export-pdf" class="btn primary-btn" style="margin-right: 10px;">تصدير كـ PDF</button>
             </div>
 
             <div class="keyboard-tabs">
